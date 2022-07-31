@@ -97,7 +97,6 @@ if (process.env.NODE_ENV === 'development') {
   ifcLoader.load('https://farhadg.github.io/ifc-demo/models/aspen.ifc', console.info);
 }
 
-
 ifcLoader.ifcManager.setupThreeMeshBVH(
   computeBoundsTree,
   disposeBoundsTree,
