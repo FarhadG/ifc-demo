@@ -1,3 +1,6 @@
+// TODO
+// better pattern of allowing any type of template (just give positions back)
+// generalize template selector and accept react components
 // custom sprite
 // drawing
 // iterating through this._annotations
@@ -91,7 +94,6 @@ export default (THREE, TWEEN) => class Annotation {
           .easing(TWEEN.Easing.Quadratic.InOut)
           .start()
           .onUpdate(() => {
-            console.log('>>>>>>>>>>>>>>>>')
             const { x, y, z } = position;
             this._camera.position.set(x, y, z);
           })
