@@ -89,7 +89,7 @@ window.addEventListener('resize', () => {
 
 const ifcLoader = new IFCLoader();
 ifcLoader.ifcManager.setWasmPath('../../');
-ifcLoader.load('https://github.com/FarhadG/ifc-demo/blob/gh-pages/models/aspen.ifc');
+ifcLoader.load('https://farhadg.github.io/ifc-demo/models/aspen.ifc');
 
 ifcLoader.ifcManager.setupThreeMeshBVH(
   computeBoundsTree,
