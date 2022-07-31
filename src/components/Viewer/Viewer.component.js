@@ -79,15 +79,11 @@ async function loadIfc() {
   const { scene, camera, controls } = CONTEXT;
   const ifcLoader = new IFCLoader();
 
-  const ifcLocation = process.env.NODE_ENV === 'development'
-    ? '../../models/aspen.ifc'
-    : 'https://farhadg.github.io/ifc-demo/models/aspen.ifc'
-
   await ifcLoader.ifcManager.setWasmPath('../../');
   ifcLoader.ifcManager.setupThreeMeshBVH(computeBoundsTree, disposeBoundsTree, acceleratedRaycast);
   CONTEXT.ifcLoader = ifcLoader;
 
-  await ifcLoader.load(ifcLocation, async (model) => {
+  await ifcLoader.load(require('./models/aspen.ifc'), async (model) => {
     const subset = await newSubsetOfType(IFCMEMBER);
     const box3 = new THREE.Box3().setFromObject(model);
     const vector = new THREE.Vector3();
