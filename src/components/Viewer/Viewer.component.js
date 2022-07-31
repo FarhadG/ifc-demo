@@ -17,6 +17,7 @@ const CONTEXT = {
   controls: null,
   camera: null,
   annotation: null,
+  ifcFile: require('./assets/aspen.ifc'),
   size: { width: window.innerWidth, height: window.innerHeight, },
 }
 
@@ -24,8 +25,9 @@ function initScene() {
   const { size } = CONTEXT;
 
   const scene = new THREE.Scene();
-  const renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true });
+  const renderer = new THREE.WebGLRenderer({ alpha: true, logarithmicDepthBuffer: true });
   renderer.setSize(size.width, size.height);
+  renderer.setClearColor(0xE8E8E8);
   renderer.setPixelRatio(1);
 
   const camera = new THREE.PerspectiveCamera(60, size.width / size.height);
@@ -34,8 +36,8 @@ function initScene() {
   camera.position.x = 8;
 
   const lightColor = 0xffffff;
-  const ambientLight = new THREE.AmbientLight(lightColor, 0.5);
-  const directionalLight = new THREE.DirectionalLight(lightColor, 0.8);
+  const ambientLight = new THREE.AmbientLight(lightColor, 0.7);
+  const directionalLight = new THREE.DirectionalLight(lightColor, 0.4);
   directionalLight.position.set(-10, 30, 10);
   scene.add(ambientLight);
   scene.add(directionalLight);
@@ -46,12 +48,12 @@ function initScene() {
 
   const loader = new THREE.CubeTextureLoader();
   scene.background = loader.load([
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg',
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg',
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg',
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-y.jpg',
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-z.jpg',
-    'https://r105.threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+    require('./assets/right.png'),
+    require('./assets/left.png'),
+    require('./assets/top.png'),
+    require('./assets/bottom.png'),
+    require('./assets/front.png'),
+    require('./assets/back.png')
   ]);
 
   window.addEventListener('resize', () => {
@@ -76,14 +78,14 @@ function animate() {
 }
 
 async function loadIfc() {
-  const { scene, camera, controls } = CONTEXT;
+  const { scene, camera, controls, ifcFile } = CONTEXT;
   const ifcLoader = new IFCLoader();
 
   await ifcLoader.ifcManager.setWasmPath('../../');
   ifcLoader.ifcManager.setupThreeMeshBVH(computeBoundsTree, disposeBoundsTree, acceleratedRaycast);
   CONTEXT.ifcLoader = ifcLoader;
 
-  await ifcLoader.load(require('./models/aspen.ifc'), async (model) => {
+  await ifcLoader.load(ifcFile, async (model) => {
     const subset = await newSubsetOfType(IFCMEMBER);
     const box3 = new THREE.Box3().setFromObject(model);
     const vector = new THREE.Vector3();
