@@ -144,7 +144,7 @@ function Viewer() {
     });
 
     renderer.domElement.addEventListener('dblclick', annotation.add);
-    // controls.addEventListener('change', annotation.hideTemplates);
+    controls.addEventListener('change', () => setTimeout(annotation.hideTemplates, 200));
 
     animate();
   }, []);

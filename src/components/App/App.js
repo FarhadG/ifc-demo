@@ -8,20 +8,22 @@ function App() {
   const [viewMode, setViewMode] = useState(true);
   return (
     <div className="App">
-      <FormControlLabel
-        label="3D"
-        className="view-toggle"
-        onClick={() => setViewMode(!viewMode)}
-        control={<Switch />}
-      />
+      {/*<FormControlLabel*/}
+      {/*  label="3D"*/}
+      {/*  className="view-toggle"*/}
+      {/*  onClick={() => setViewMode(!viewMode)}*/}
+      {/*  control={<Switch />}*/}
+      {/*/>*/}
 
-      <div className={viewMode ? 'visible' : 'hide'}>
-        <Configurator />
-      </div>
+      {/*<div className={viewMode ? 'visible' : 'hide'}>*/}
+      {/*  <Configurator />*/}
+      {/*</div>*/}
 
-      <div className={!viewMode ? 'visible' : 'hide'}>
-        <Viewer />
-      </div>
+      {/*<div className={!viewMode ? 'visible' : 'hide'}>*/}
+      {/*  <Viewer />*/}
+      {/*</div>*/}
+
+      <Viewer />
     </div>
   );
 }
