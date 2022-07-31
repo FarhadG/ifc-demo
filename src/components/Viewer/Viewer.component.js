@@ -21,8 +21,9 @@ import {
   IFCWINDOW,
   IFCMEMBER,
 } from 'web-ifc';
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import _ from 'lodash';
+import SendIcon from '@mui/icons-material/Send';
 
 import getAnnotationModule from '../annotation';
 import './Viewer.scss';
@@ -76,6 +77,7 @@ const animate = () => {
   controls.update();
   annotation.update();
   renderer.render(scene, camera);
+  TWEEN.update();
   requestAnimationFrame(animate);
 };
 
@@ -93,7 +95,16 @@ const ifcLocation = process.env.NODE_ENV === 'development'
   ? '../../models/aspen.ifc'
   : 'https://farhadg.github.io/ifc-demo/models/aspen.ifc'
 ifcLoader.ifcManager.setWasmPath('../../');
-ifcLoader.load(ifcLocation);
+ifcLoader.load(ifcLocation, (model) => {
+  // const box3 = new THREE.Box3().setFromObject(model);
+  // const vector = new THREE.Vector3();
+  // box3.getCenter(vector);
+  // model.position.set(-vector.x, -vector.y, -vector.z);
+  // scene.add(model);
+  // camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
+  // controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939);
+  // scene.add(model);
+});
 
 ifcLoader.ifcManager.setupThreeMeshBVH(
   computeBoundsTree,
@@ -121,7 +132,7 @@ async function handleCheckbox(category, checked) {
     subset.position.set(-vector.x, -vector.y, -vector.z);
     scene.add(subset);
     camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
-    controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939)
+    controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939);
   }
   else {
     subset.removeFromParent();
@@ -137,7 +148,7 @@ function Viewer() {
     if (loaded) return;
     loaded = true;
     container.current.appendChild(renderer.domElement);
-    setTimeout(() => handleCheckbox(IFCMEMBER, true), 1000);
+    setTimeout(() => handleCheckbox(IFCMEMBER, true), 200);
     annotation = new (getAnnotationModule(THREE, TWEEN))({
       renderer, camera, scene, templateSelector: '.annotation'
     });
@@ -157,9 +168,7 @@ function Viewer() {
               label={name}
               control={<Checkbox
                 defaultChecked={category === IFCMEMBER}
-                onChange={(e) => {
-                  handleCheckbox(category, e.target.checked);
-                }}
+                onChange={(e) => handleCheckbox(category, e.target.checked)}
               />}
             />
           ))}
@@ -168,8 +177,9 @@ function Viewer() {
         <div className="annotation hide">
           <textarea className="title" type="text" placeholder="Comment" maxLength="64"
                     required></textarea>
-          <input className="submit" type="submit" />
+          <Button variant="contained" endIcon={<SendIcon />}>Send</Button>
         </div>
+
       </div>
       <div ref={container}></div>
     </div>

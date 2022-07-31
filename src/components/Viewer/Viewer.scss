@@ -15,7 +15,12 @@
   padding: 10px;
   transition: opacity .2s;
 
-  .title, .submit {
+  .title {
+    background: black;
+    border: 2px solid #444;
+    padding: 5px;
+    margin-bottom: 10px;
+    line-height: 1.5;
     color: white;
     display: block;
     box-shadow: none;
@@ -23,21 +28,8 @@
     font: 14px sans-serif;
   }
 
-  .title {
-    background: black;
-    border: 2px solid #444;
-    padding: 5px;
-    margin-bottom: 10px;
-    line-height: 1.5;
-  }
-
-  .submit {
+  button {
     width: 100%;
-    background-color: #1149c6;
-    border: none;
-    padding: 5px 15px;
-    border-radius: 5px;
-    float: right;
   }
 }
 

@@ -86,18 +86,24 @@ export default (THREE, TWEEN) => class Annotation {
       };
 
       if (TWEEN) {
-        new TWEEN.Tween(position).to(target, 1000).onUpdate(() => {
-          const { x, y, z } = position;
-          this._camera.position.set(x, y, z);
-        }).easing(TWEEN.Easing.Quadratic.InOut).start().onComplete(() => {
-          if (this._templateSelector) {
-            setTimeout(() => {
-              this._templateOpen = true;
-              const template = this.getTemplate(uuid);
-              Object.assign(template.style, { display: 'block', opacity: 1 });
-            }, 100);
-          }
-        });
+        new TWEEN.Tween(position)
+          .to(target, 1000)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .start()
+          .onUpdate(() => {
+            console.log('>>>>>>>>>>>>>>>>')
+            const { x, y, z } = position;
+            this._camera.position.set(x, y, z);
+          })
+          .onComplete(() => {
+            if (this._templateSelector) {
+              setTimeout(() => {
+                this._templateOpen = true;
+                const template = this.getTemplate(uuid);
+                Object.assign(template.style, { display: 'block', opacity: 1 });
+              }, 100);
+            }
+          });
       }
     }
   }
