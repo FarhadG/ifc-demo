@@ -88,8 +88,15 @@ window.addEventListener('resize', () => {
 });
 
 const ifcLoader = new IFCLoader();
-ifcLoader.ifcManager.setWasmPath('../../');
-ifcLoader.load('https://farhadg.github.io/ifc-demo/models/aspen.ifc');
+
+if (process.env.NODE_ENV === 'development') {
+  ifcLoader.ifcManager.setWasmPath('../../');
+  ifcLoader.load('../../models/aspen.ifc', console.info);
+} else {
+  ifcLoader.ifcManager.setWasmPath('https://farhadg.github.io/ifc-demo/');
+  ifcLoader.load('https://farhadg.github.io/ifc-demo/models/aspen.ifc', console.info);
+}
+
 
 ifcLoader.ifcManager.setupThreeMeshBVH(
   computeBoundsTree,
