@@ -137,12 +137,12 @@ function Viewer() {
 
   return (
     <div className="Viewer">
+      <div ref={container} />
+
       <div className="annotation hide">
         <textarea className="text-box" placeholder="Comment" maxLength="129" required />
         <Button variant="contained" endIcon={<SendIcon />}>Submit</Button>
       </div>
-
-      <div ref={container} />
     </div>
   );
 }
