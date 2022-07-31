@@ -1,18 +1,17 @@
-import * as THREE from 'three';
 import { useRef, useEffect } from 'react';
+import { Button } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import * as THREE from 'three';
+import { IFCMEMBER } from 'web-ifc';
 import TWEEN from '@tweenjs/tween.js';
-import { AmbientLight, DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer, } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { IFCLoader } from 'web-ifc-three/IFCLoader';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree, } from 'three-mesh-bvh';
-import { IFCMEMBER } from 'web-ifc';
-import { Button } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
 
 import initAnnotation from '../../module/annotation';
 import './Viewer.scss';
 
-let context = {
+const CONTEXT = {
   scene: null,
   renderer: null,
   controls: null,
@@ -22,21 +21,21 @@ let context = {
 }
 
 function initScene() {
-  const { size } = context;
+  const { size } = CONTEXT;
 
-  const scene = new Scene();
-  const renderer = new WebGLRenderer({ logarithmicDepthBuffer: true });
+  const scene = new THREE.Scene();
+  const renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true });
   renderer.setSize(size.width, size.height);
   renderer.setPixelRatio(1);
 
-  const camera = new PerspectiveCamera(60, size.width / size.height);
+  const camera = new THREE.PerspectiveCamera(60, size.width / size.height);
   camera.position.z = 15;
   camera.position.y = 13;
   camera.position.x = 8;
 
   const lightColor = 0xffffff;
-  const ambientLight = new AmbientLight(lightColor, 0.5);
-  const directionalLight = new DirectionalLight(lightColor, 0.8);
+  const ambientLight = new THREE.AmbientLight(lightColor, 0.5);
+  const directionalLight = new THREE.DirectionalLight(lightColor, 0.8);
   directionalLight.position.set(-10, 30, 10);
   scene.add(ambientLight);
   scene.add(directionalLight);
@@ -56,7 +55,7 @@ function initScene() {
   ]);
 
   window.addEventListener('resize', () => {
-    const { size, camera, renderer } = context;
+    const { size, camera, renderer } = CONTEXT;
     size.width = window.innerWidth
     size.height = window.innerHeight;
     camera.aspect = size.width / size.height;
@@ -64,11 +63,11 @@ function initScene() {
     renderer.setSize(size.width, size.height);
   });
 
-  context = { ...context, scene, camera, renderer, controls };
+  Object.assign(CONTEXT, { scene, camera, renderer, controls });
 }
 
 function animate() {
-  const { annotation, controls, renderer, scene, camera } = context;
+  const { annotation, controls, renderer, scene, camera } = CONTEXT;
   TWEEN.update();
   controls.update();
   annotation.update();
@@ -77,7 +76,7 @@ function animate() {
 }
 
 async function loadIfc() {
-  const { scene, camera, controls } = context;
+  const { scene, camera, controls } = CONTEXT;
   const ifcLoader = new IFCLoader();
 
   const ifcLocation = process.env.NODE_ENV === 'development'
@@ -86,7 +85,7 @@ async function loadIfc() {
 
   await ifcLoader.ifcManager.setWasmPath('../../');
   ifcLoader.ifcManager.setupThreeMeshBVH(computeBoundsTree, disposeBoundsTree, acceleratedRaycast);
-  context.ifcLoader = ifcLoader;
+  CONTEXT.ifcLoader = ifcLoader;
 
   await ifcLoader.load(ifcLocation, async (model) => {
     const subset = await newSubsetOfType(IFCMEMBER);
@@ -101,7 +100,7 @@ async function loadIfc() {
 }
 
 async function newSubsetOfType(category) {
-  const { ifcLoader, scene } = context;
+  const { ifcLoader, scene } = CONTEXT;
   const ids = await ifcLoader.ifcManager.getAllItemsOfType(0, category, false);
   return ifcLoader.ifcManager.createSubset({
     modelID: 0,
@@ -116,13 +115,13 @@ function Viewer() {
   const container = useRef(null);
 
   useEffect(() => {
-    if (context.scene) return;
+    if (CONTEXT.scene) return;
 
     initScene();
     loadIfc();
 
-    const { scene, renderer, controls, camera } = context;
-    container.current.appendChild(context.renderer.domElement);
+    const { scene, renderer, controls, camera } = CONTEXT;
+    container.current.appendChild(CONTEXT.renderer.domElement);
 
     const annotation = new (initAnnotation(THREE, TWEEN))({
       renderer, camera, scene, templateSelector: '.annotation'
@@ -131,7 +130,7 @@ function Viewer() {
     renderer.domElement.addEventListener('dblclick', annotation.add);
     controls.addEventListener('start', annotation.hideTemplates);
 
-    context.annotation = annotation;
+    CONTEXT.annotation = annotation;
     animate();
   }, []);
 

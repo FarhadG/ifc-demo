@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { FormControlLabel, Switch } from '@mui/material';
+
 import Configurator from '../Configurator/Configurator.component';
 import Viewer from '../Viewer/Viewer.component';
 import './App.scss';
-import { FormControlLabel, Switch } from '@mui/material';
+
+const URL = 'https://visualize.mybuild.wtsparadigm.com/?clientId=979326c6-bbcf-4a0f-a749-4c2e718ce7bb&templateId=9de4e2c9-1bf3-48c1-a196-8b9b48a5a797';
 
 function App() {
   const [viewMode, setViewMode] = useState(true);
@@ -16,7 +19,7 @@ function App() {
       />
 
       <div className={viewMode ? 'visible' : 'hide'}>
-        <Configurator />
+        <Configurator url={URL} />
       </div>
 
       <div className={!viewMode ? 'visible' : 'hide'}>
