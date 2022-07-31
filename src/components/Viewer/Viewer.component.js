@@ -13,86 +13,81 @@ import SendIcon from '@mui/icons-material/Send';
 import getAnnotationModule from '../annotation';
 import './Viewer.scss';
 
-const categories = { IFCWALLSTANDARDCASE, IFCDOOR, IFCWINDOW, IFCMEMBER };
+let context = {
+  scene: null,
+  renderer: null,
+  controls: null,
+  camera: null,
+  annotation: null,
+  subsets: {},
+  categories: { IFCWALLSTANDARDCASE, IFCDOOR, IFCWINDOW, IFCMEMBER },
+  size: { width: window.innerWidth, height: window.innerHeight, },
+}
 
-let loaded = false;
+function initScene() {
+  const { size } = context;
 
-const subsets = {};
-
-const size = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
-
-const scene = new Scene();
-const renderer = new WebGLRenderer({ alpha: true });
-renderer.setSize(size.width, size.height);
+  const scene = new Scene();
+  const renderer = new WebGLRenderer({ alpha: true });
+  renderer.setSize(size.width, size.height);
 // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setPixelRatio(1);
+  renderer.setPixelRatio(1);
 
-const camera = new PerspectiveCamera(75, size.width / size.height);
-camera.position.z = 15;
-camera.position.y = 13;
-camera.position.x = 8;
+  const camera = new PerspectiveCamera(75, size.width / size.height);
+  camera.position.z = 15;
+  camera.position.y = 13;
+  camera.position.x = 8;
 
-window.scene = scene;
-window.camera = camera;
+  const lightColor = 0xffffff;
+  const ambientLight = new AmbientLight(lightColor, 0.5);
+  scene.add(ambientLight);
+  const directionalLight = new DirectionalLight(lightColor, 1);
+  directionalLight.position.set(0, 10, 0);
+  directionalLight.target.position.set(-5, 0, 0);
+  scene.add(directionalLight);
+  scene.add(directionalLight.target);
 
-const lightColor = 0xffffff;
-const ambientLight = new AmbientLight(lightColor, 0.5);
-scene.add(ambientLight);
-const directionalLight = new DirectionalLight(lightColor, 1);
-directionalLight.position.set(0, 10, 0);
-directionalLight.target.position.set(-5, 0, 0);
-scene.add(directionalLight);
-scene.add(directionalLight.target);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(-2, 0, 0);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.target.set(-2, 0, 0);
+  window.addEventListener('resize', () => {
+    const { size, camera, renderer } = context;
+    size.width = window.innerWidth
+    size.height = window.innerHeight;
+    camera.aspect = size.width / size.height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(size.width, size.height);
+  });
 
-window.controls = controls;
+  context = { ...context, scene, camera, renderer, controls }
+}
 
-const animate = () => {
+function animate() {
+  const { annotation, controls, renderer, scene, camera } = context;
   controls.update();
   annotation.update();
   renderer.render(scene, camera);
   TWEEN.update();
   requestAnimationFrame(animate);
-};
+}
 
-window.addEventListener('resize', () => {
-  size.width = window.innerWidth
-  size.height = window.innerHeight;
-  camera.aspect = size.width / size.height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(size.width, size.height);
-});
+async function loadIfc() {
+  const ifcLoader = new IFCLoader();
 
-const ifcLoader = new IFCLoader();
+  const ifcLocation = process.env.NODE_ENV === 'development'
+    ? '../../models/aspen.ifc'
+    : 'https://farhadg.github.io/ifc-demo/models/aspen.ifc'
 
-const ifcLocation = process.env.NODE_ENV === 'development'
-  ? '../../models/aspen.ifc'
-  : 'https://farhadg.github.io/ifc-demo/models/aspen.ifc'
-ifcLoader.ifcManager.setWasmPath('../../');
-ifcLoader.load(ifcLocation, (model) => {
-  // const box3 = new THREE.Box3().setFromObject(model);
-  // const vector = new THREE.Vector3();
-  // box3.getCenter(vector);
-  // model.position.set(-vector.x, -vector.y, -vector.z);
-  // scene.add(model);
-  // camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
-  // controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939);
-  // scene.add(model);
-});
+  await ifcLoader.ifcManager.setWasmPath('../../');
+  ifcLoader.ifcManager.setupThreeMeshBVH(computeBoundsTree, disposeBoundsTree, acceleratedRaycast);
+  context.ifcLoader = ifcLoader;
 
-ifcLoader.ifcManager.setupThreeMeshBVH(
-  computeBoundsTree,
-  disposeBoundsTree,
-  acceleratedRaycast
-);
+  await ifcLoader.load(ifcLocation, () => handleCheckbox(IFCMEMBER, true));
+}
 
 async function newSubsetOfType(category) {
+  const { ifcLoader, scene } = context;
   const ids = await ifcLoader.ifcManager.getAllItemsOfType(0, category, false);
   return ifcLoader.ifcManager.createSubset({
     modelID: 0,
@@ -104,38 +99,38 @@ async function newSubsetOfType(category) {
 }
 
 async function handleCheckbox(category, checked) {
+  const { subsets, scene, camera, controls} = context;
   const subset = subsets[category] = await newSubsetOfType(category);
-  if (checked) {
-    const box3 = new THREE.Box3().setFromObject(subset);
-    const vector = new THREE.Vector3();
-    box3.getCenter(vector);
-    subset.position.set(-vector.x, -vector.y, -vector.z);
-    scene.add(subset);
-    camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
-    controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939);
-  }
-  else {
-    subset.removeFromParent();
-  }
+  if (!checked) return subset.removeFromParent();
+  const box3 = new THREE.Box3().setFromObject(subset);
+  const vector = new THREE.Vector3();
+  box3.getCenter(vector);
+  subset.position.set(-vector.x, -vector.y, -vector.z);
+  camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
+  controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939);
+  scene.add(subset);
 }
-
-let annotation;
 
 function Viewer() {
   const container = useRef(null);
 
   useEffect(() => {
-    if (loaded) return;
-    loaded = true;
-    container.current.appendChild(renderer.domElement);
-    setTimeout(() => handleCheckbox(IFCMEMBER, true), 200);
-    annotation = new (getAnnotationModule(THREE, TWEEN))({
+    if (!context.scene) {
+      initScene();
+      loadIfc();
+    }
+
+    const { scene, renderer, controls, camera } = context;
+    container.current.appendChild(context.renderer.domElement);
+
+    const annotation = new (getAnnotationModule(THREE, TWEEN))({
       renderer, camera, scene, templateSelector: '.annotation'
     });
 
     renderer.domElement.addEventListener('dblclick', annotation.add);
     controls.addEventListener('start', annotation.hideTemplates);
 
+    context.annotation = annotation;
     animate();
   }, []);
 
@@ -143,7 +138,7 @@ function Viewer() {
     <div className="Viewer">
       <div className="menu">
         <FormGroup>
-          {_.map(categories, (category, name) => (
+          {_.map(context.categories, (category, name) => (
             <FormControlLabel
               label={name}
               control={<Checkbox
