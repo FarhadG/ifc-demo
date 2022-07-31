@@ -89,13 +89,11 @@ window.addEventListener('resize', () => {
 
 const ifcLoader = new IFCLoader();
 
-if (process.env.NODE_ENV === 'development') {
-  ifcLoader.ifcManager.setWasmPath('../../');
-  ifcLoader.load('../../models/aspen.ifc', console.info);
-} else {
-  ifcLoader.ifcManager.setWasmPath('https://farhadg.github.io/ifc-demo/');
-  ifcLoader.load('https://farhadg.github.io/ifc-demo/models/aspen.ifc', console.info);
-}
+const ifcLocation = process.env.NODE_ENV === 'development'
+  ? '../../models/aspen.ifc'
+  : 'https://farhadg.github.io/ifc-demo/models/aspen.ifc'
+ifcLoader.ifcManager.setWasmPath('../../');
+ifcLoader.load(ifcLocation);
 
 ifcLoader.ifcManager.setupThreeMeshBVH(
   computeBoundsTree,
@@ -124,7 +122,8 @@ async function handleCheckbox(category, checked) {
     scene.add(subset);
     camera.position.set(-48.4299140328955, 11.537300458619915, 618.3302324487776);
     controls.target.set(-82.24609482132936, -8.189374308601197, 4.500647371273939)
-  } else {
+  }
+  else {
     subset.removeFromParent();
   }
 }
@@ -144,7 +143,7 @@ function Viewer() {
     });
 
     renderer.domElement.addEventListener('dblclick', annotation.add);
-    controls.addEventListener('change', () => setTimeout(annotation.hideTemplates, 200));
+    controls.addEventListener('start', annotation.hideTemplates);
 
     animate();
   }, []);
