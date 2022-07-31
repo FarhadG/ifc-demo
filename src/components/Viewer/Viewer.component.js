@@ -1,39 +1,19 @@
-import { useRef, useEffect } from 'react';
+import _ from 'lodash';
 import * as THREE from 'three';
+import { useRef, useEffect } from 'react';
 import TWEEN from '@tweenjs/tween.js';
-import {
-  AmbientLight,
-  DirectionalLight,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-} from 'three';
+import { AmbientLight, DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer, } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { IFCLoader } from 'web-ifc-three/IFCLoader';
-import {
-  acceleratedRaycast,
-  computeBoundsTree,
-  disposeBoundsTree,
-} from 'three-mesh-bvh';
-import {
-  IFCWALLSTANDARDCASE,
-  IFCDOOR,
-  IFCWINDOW,
-  IFCMEMBER,
-} from 'web-ifc';
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree, } from 'three-mesh-bvh';
+import { IFCWALLSTANDARDCASE, IFCDOOR, IFCWINDOW, IFCMEMBER } from 'web-ifc';
 import { Button, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-import _ from 'lodash';
 import SendIcon from '@mui/icons-material/Send';
 
 import getAnnotationModule from '../annotation';
 import './Viewer.scss';
 
-const categories = {
-  IFCWALLSTANDARDCASE,
-  IFCDOOR,
-  IFCWINDOW,
-  IFCMEMBER
-};
+const categories = { IFCWALLSTANDARDCASE, IFCDOOR, IFCWINDOW, IFCMEMBER };
 
 let loaded = false;
 
@@ -175,8 +155,11 @@ function Viewer() {
         </FormGroup>
 
         <div className="annotation hide">
-          <textarea className="title" type="text" placeholder="Comment" maxLength="64"
-                    required></textarea>
+          <textarea className="title"
+                    type="text"
+                    placeholder="Comment"
+                    maxLength="64"
+                    required />
           <Button variant="contained" endIcon={<SendIcon />}>Send</Button>
         </div>
 
