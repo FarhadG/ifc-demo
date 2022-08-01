@@ -17,11 +17,11 @@ function App() {
         <Typography>Frame</Typography>
       </Stack>
 
-      <div className={viewMode ? 'visible' : 'hide'}>
+      <div className={realisticMode ? 'visible' : 'hide'}>
         <Configurator url={URL} />
       </div>
 
-      <div className={!viewMode ? 'visible' : 'hide'}>
+      <div className={!realisticMode ? 'visible' : 'hide'}>
         <Viewer />
       </div>
     </div>
