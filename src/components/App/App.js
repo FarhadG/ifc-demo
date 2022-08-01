@@ -8,12 +8,12 @@ import './App.scss';
 const URL = 'https://visualize.mybuild.wtsparadigm.com/?clientId=979326c6-bbcf-4a0f-a749-4c2e718ce7bb&templateId=9de4e2c9-1bf3-48c1-a196-8b9b48a5a797';
 
 function App() {
-  const [realisticMode, setViewMode] = useState(true);
+  const [realisticMode, toggleRealisticMode] = useState(true);
   return (
     <div className="App">
       <Stack direction="row" className="view-toggle" spacing={1} alignItems="center">
         <Typography>Realistic</Typography>
-        <Switch onClick={() => setViewMode(!realisticMode)} />
+        <Switch onClick={() => toggleRealisticMode(!realisticMode)} />
         <Typography>Frame</Typography>
       </Stack>
 
