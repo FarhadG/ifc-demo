@@ -37,7 +37,7 @@ function initScene() {
 
   const lightColor = 0xffffff;
   const ambientLight = new THREE.AmbientLight(lightColor, 0.7);
-  const directionalLight = new THREE.DirectionalLight(lightColor, 0.4);
+  const directionalLight = new THREE.DirectionalLight(lightColor, 0.7);
   directionalLight.position.set(-10, 30, 10);
   scene.add(ambientLight);
   scene.add(directionalLight);
