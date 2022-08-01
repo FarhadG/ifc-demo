@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FormControlLabel, Switch } from '@mui/material';
+import { Stack, Switch, Typography } from '@mui/material';
 
 import Configurator from '../Configurator/Configurator.component';
 import Viewer from '../Viewer/Viewer.component';
@@ -11,12 +11,11 @@ function App() {
   const [viewMode, setViewMode] = useState(true);
   return (
     <div className="App">
-      <FormControlLabel
-        label="3D"
-        className="view-toggle"
-        onClick={() => setViewMode(!viewMode)}
-        control={<Switch />}
-      />
+      <Stack direction="row" className="view-toggle" spacing={1} alignItems="center">
+        <Typography>Realistic</Typography>
+        <Switch onClick={() => setViewMode(!viewMode)} />
+        <Typography>Frame</Typography>
+      </Stack>
 
       <div className={viewMode ? 'visible' : 'hide'}>
         <Configurator url={URL} />
