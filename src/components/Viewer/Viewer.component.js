@@ -48,13 +48,9 @@ function initScene() {
 
   const loader = new THREE.CubeTextureLoader();
   scene.background = loader.load([
-    require('./assets/right.png'),
-    require('./assets/left.png'),
-    require('./assets/top.png'),
-    require('./assets/bottom.png'),
-    require('./assets/front.png'),
-    require('./assets/back.png')
-  ]);
+    'right', 'left', 'top', 'bottom', 'front', 'back'
+    ].map(side => require(`./assets/${side}.png`))
+  );
 
   window.addEventListener('resize', () => {
     const { size, camera, renderer } = CONTEXT;
